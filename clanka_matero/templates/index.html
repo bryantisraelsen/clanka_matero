@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clanka Matero - Hot Water Dispenser Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clanka Matero</h1>
+            <button id="theme-toggle" class="theme-toggle">🌙</button>
+        </header>
+
+        <main>
+            <section class="status-section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <label>Current Temperature:</label>
+                        <span id="current-temp">--°F</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Desired Temperature:</label>
+                        <span id="desired-temp">--°F</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Heater:</label>
+                        <span id="heater-status" class="status-indicator">OFF</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Water Level:</label>
+                        <span id="water-level-status" class="status-indicator">OK</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Auto Heat:</label>
+                        <span id="auto-heat-status" class="status-indicator">ON</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="controls-section">
+                <h2>Controls</h2>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <label for="desired-temp-input">Desired Temperature (°F):</label>
+                        <input type="number" id="desired-temp-input" min="70" max="212" step="0.5">
+                        <button id="set-temp-btn">Set</button>
+                    </div>
+
+                    <div class="control-item">
+                        <label for="dispense-time-input">Dispense Time (seconds):</label>
+                        <input type="number" id="dispense-time-input" min="1" max="10" value="2" step="0.25">
+                        <button id="set-dispense-time-btn">Set</button>
+                    </div>
+
+                    <div class="control-item">
+                        <label>Auto Heat:</label>
+                        <button id="toggle-auto-heat" class="toggle-btn">ON</button>
+                    </div>
+
+                    <div class="control-item">
+                        <label>Dispense:</label>
+                        <button id="dispense-btn" class="action-btn">Dispense Water</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
