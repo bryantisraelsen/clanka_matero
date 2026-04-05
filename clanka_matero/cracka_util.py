@@ -6,7 +6,7 @@ import threading
 import json
 import os
 import RPi.GPIO as GPIO
-from gpiozero import OutputDevice
+from gpiozero import OutputDevice, Button, LED
 
 class CrackaController:
     def __init__(self):
@@ -25,6 +25,13 @@ class CrackaController:
 
         self.heater = OutputDevice(6)
 
+        # Valve
+        self.valve = LED(22)
+
+        # Buttons
+        self.button_hold = Button(17, pull_up=True, bounce_time=0.05)
+        self.button_timer = Button(27, pull_up=True, bounce_time=0.05)
+
         # ---- Temp sensor ----
         base_dir = '/sys/bus/w1/devices/'
         device_folder = glob.glob(base_dir + '28*')[0]
@@ -35,7 +42,29 @@ class CrackaController:
         self.auto_thread = None
         self.auto_running = False
 
+        # Dispense control
+        self.dispensing = False
+        self.dispense_enabled = False
+        self.dispense_lock = threading.Lock()
+
         self._ensure_default_config()
+        self._setup_button_handlers()
+
+    # ---------------- BUTTON SETUP ----------------
+
+    def _setup_button_handlers(self):
+        self.button_timer.when_pressed = self.start_dispense
+        self.button_hold.when_pressed = self._hold_pressed
+        self.button_hold.when_released = self._hold_released
+
+    def _hold_pressed(self):
+        if not self.dispense_enabled:
+            return
+
+        self.valve.on()
+
+    def _hold_released(self):
+        self.valve.off()
 
     # ---------------- CONFIG ----------------
 
@@ -100,13 +129,33 @@ class CrackaController:
     def get_if_currently_heating(self):
         return self.heater_on
 
-    # ---------------- HEATER CONTROL ----------------
+    def get_if_auto_heat_running(self):
+        return self.auto_running
+
+    def get_if_dispensing(self):
+        return self.dispensing
+
+    def get_if_dispense_enabled(self):
+        return self.dispense_enabled
+
+    # ---------------- DISPENSE ENABLE CONTROL ----------------
+
+    def enable_dispense(self):
+        self.dispense_enabled = True
+
+    def disable_dispense(self):
+        self.dispense_enabled = False
+        self.valve.off()
+
+    # ---------------- STATUS ----------------
 
     def _write_status(self, data):
         tmp = self.STATUS_FILE + ".tmp"
         with open(tmp, "w") as f:
             json.dump(data, f, indent=2)
         os.replace(tmp, self.STATUS_FILE)
+
+    # ---------------- AUTO HEAT ----------------
 
     def _auto_loop(self):
         hysteresis_f = 1.0
@@ -167,3 +216,29 @@ class CrackaController:
 
     def get_if_auto_heat_running(self):
         return self.auto_running
+
+# ---------------- DISPENSING ----------------
+
+    def start_dispense(self):
+        if not self.dispense_enabled:
+            return False
+
+        if self.dispensing:
+            return False
+
+        def _dispense():
+            with self.dispense_lock:
+                self.dispensing = True
+
+                config = self._read_config()
+                duration = config.get("dispense_time_sec", 2.0)
+
+                try:
+                    self.valve.on()
+                    time.sleep(duration)
+                    self.valve.off()
+                finally:
+                    self.dispensing = False
+
+        threading.Thread(target=_dispense, daemon=True).start()
+        return True
