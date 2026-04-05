@@ -164,3 +164,6 @@ class CrackaController:
         self.auto_running = False
         self.heater.off()
         self.heater_on = False
+
+    def get_if_auto_heat_running(self):
+        return self.auto_running

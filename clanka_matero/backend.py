@@ -15,6 +15,49 @@ def status():
         "current_temp_f": ctrl.get_curr_temperature(),
         "target_temp_f": ctrl.get_specified_temperature(),
         "dispense_time_sec": ctrl.get_dispense_time(),
+        "heating": ctrl.get_if_currently_heating(),
+        "auto_heat_running": ctrl.get_if_auto_heat_running()
+    })
+
+@app.route("/auto_heat_status")
+def auto_status():
+    return jsonify({
+        "auto_heat_running": ctrl.get_if_auto_heat_running()
+    })
+
+@app.route("/water_ok_status")
+def water_ok_status():
+    return jsonify({
+        "water_ok": ctrl.get_water_level_ok()
+    })
+
+@app.route("/current_temp_f_status")
+def water_ok_status():
+    return jsonify({
+        "current_temp_f": ctrl.get_curr_temperature()
+    })
+
+@app.route("/target_temp_f_status")
+def water_ok_status():
+    return jsonify({
+        "target_temp_f": ctrl.get_specified_temperature()
+    })
+
+@app.route("/dispense_time_status")
+def water_ok_status():
+    return jsonify({
+        "dispense_time_sec": ctrl.get_dispense_time()
+    })
+
+@app.route("/dispense_time_status")
+def water_ok_status():
+    return jsonify({
+        "heating": ctrl.get_if_currently_heating()
+    })
+
+@app.route("/heating_status")
+def water_ok_status():
+    return jsonify({
         "heating": ctrl.get_if_currently_heating()
     })
 
