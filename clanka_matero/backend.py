@@ -32,31 +32,25 @@ def water_ok_status():
     })
 
 @app.route("/current_temp_f_status")
-def water_ok_status():
+def current_temp_f_status():
     return jsonify({
         "current_temp_f": ctrl.get_curr_temperature()
     })
 
 @app.route("/target_temp_f_status")
-def water_ok_status():
+def target_temp_f_status():
     return jsonify({
         "target_temp_f": ctrl.get_specified_temperature()
     })
 
 @app.route("/dispense_time_status")
-def water_ok_status():
+def dispense_time_status():
     return jsonify({
         "dispense_time_sec": ctrl.get_dispense_time()
     })
 
-@app.route("/dispense_time_status")
-def water_ok_status():
-    return jsonify({
-        "heating": ctrl.get_if_currently_heating()
-    })
-
 @app.route("/heating_status")
-def water_ok_status():
+def heating_status():
     return jsonify({
         "heating": ctrl.get_if_currently_heating()
     })
