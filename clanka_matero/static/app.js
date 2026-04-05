@@ -1,0 +1,221 @@
+// Clanka Matero Web UI JavaScript
+
+class ClankaMateroApp {
+    constructor() {
+        this.statusElements = {
+            currentTemp: document.getElementById('current-temp'),
+            desiredTemp: document.getElementById('desired-temp'),
+            heaterStatus: document.getElementById('heater-status'),
+            waterLevelStatus: document.getElementById('water-level-status'),
+            autoHeatStatus: document.getElementById('auto-heat-status')
+        };
+
+        this.controlElements = {
+            desiredTempInput: document.getElementById('desired-temp-input'),
+            setTempBtn: document.getElementById('set-temp-btn'),
+            dispenseTimeInput: document.getElementById('dispense-time-input'),
+            setDispenseTimeBtn: document.getElementById('set-dispense-time-btn'),
+            toggleAutoHeatBtn: document.getElementById('toggle-auto-heat'),
+            dispenseBtn: document.getElementById('dispense-btn')
+        };
+
+        this.themeToggle = document.getElementById('theme-toggle');
+        this.currentTheme = localStorage.getItem('theme') || 'dark';
+
+        this.init();
+    }
+
+    init() {
+        this.setupTheme();
+        this.setupEventListeners();
+        this.startPolling();
+        this.loadInitialData();
+    }
+
+    setupTheme() {
+        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        this.updateThemeButton();
+    }
+
+    updateThemeButton() {
+        this.themeToggle.textContent = this.currentTheme === 'light' ? '🌙' : '☀️';
+    }
+
+    toggleTheme() {
+        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        localStorage.setItem('theme', this.currentTheme);
+        this.updateThemeButton();
+    }
+
+    setupEventListeners() {
+        // Theme toggle
+        this.themeToggle.addEventListener('click', () => this.toggleTheme());
+
+        // Temperature control
+        this.controlElements.setTempBtn.addEventListener('click', () => this.setDesiredTemperature());
+
+        // Dispense time control
+        this.controlElements.setDispenseTimeBtn.addEventListener('click', () => this.setDispenseTime());
+
+        // Auto heat toggle
+        this.controlElements.toggleAutoHeatBtn.addEventListener('click', () => this.toggleAutoHeat());
+
+        // Dispense action
+        this.controlElements.dispenseBtn.addEventListener('click', () => this.dispense());
+
+        // Enter key support for inputs
+        this.controlElements.desiredTempInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.setDesiredTemperature();
+        });
+
+        this.controlElements.dispenseTimeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.setDispenseTime();
+        });
+    }
+
+    async loadInitialData() {
+        await this.updateStatus();
+    }
+
+    startPolling() {
+        // Poll every 2 seconds
+        setInterval(() => this.updateStatus(), 2000);
+    }
+
+    async updateStatus() {
+        try {
+            const response = await fetch('/api/status');
+            const data = await response.json();
+
+            this.updateStatusDisplay(data);
+        } catch (error) {
+            console.error('Failed to update status:', error);
+        }
+    }
+
+    updateStatusDisplay(data) {
+        this.statusElements.currentTemp.textContent = `${data.current_temperature}°C`;
+        this.statusElements.desiredTemp.textContent = `${data.desired_temperature}°C`;
+
+        this.updateStatusIndicator(this.statusElements.heaterStatus, data.heater_on);
+        this.updateStatusIndicator(this.statusElements.waterLevelStatus, data.water_level_ok ? 'ok' : 'low');
+        this.updateStatusIndicator(this.statusElements.autoHeatStatus, data.auto_heat_on);
+
+        // Update control values
+        this.controlElements.desiredTempInput.value = data.desired_temperature;
+        this.controlElements.dispenseTimeInput.value = data.dispense_time;
+        this.controlElements.toggleAutoHeatBtn.textContent = data.auto_heat_on ? 'ON' : 'OFF';
+        this.controlElements.toggleAutoHeatBtn.setAttribute('data-active', data.auto_heat_on);
+    }
+
+    updateStatusIndicator(element, isActive) {
+        element.textContent = isActive ? 'ON' : 'OFF';
+        element.setAttribute('data-status', isActive);
+    }
+
+    async setDesiredTemperature() {
+        const temperature = parseFloat(this.controlElements.desiredTempInput.value);
+        if (isNaN(temperature) || temperature < 70 || temperature > 212) {
+            alert('Please enter a valid temperature between 20°F and 212°F');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/temperature', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ temperature })
+            });
+
+            if (response.ok) {
+                await this.updateStatus();
+            } else {
+                alert('Failed to set temperature');
+            }
+        } catch (error) {
+            console.error('Failed to set temperature:', error);
+            alert('Failed to set temperature');
+        }
+    }
+
+    async setDispenseTime() {
+        const time = parseInt(this.controlElements.dispenseTimeInput.value);
+        if (isNaN(time) || time < 1 || time > 300) {
+            alert('Please enter a valid time between 1 and 300 seconds');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/dispense-time', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time })
+            });
+
+            if (response.ok) {
+                await this.updateStatus();
+            } else {
+                alert('Failed to set dispense time');
+            }
+        } catch (error) {
+            console.error('Failed to set dispense time:', error);
+            alert('Failed to set dispense time');
+        }
+    }
+
+    async toggleAutoHeat() {
+        const currentState = this.controlElements.toggleAutoHeatBtn.getAttribute('data-active') === 'true';
+        const newState = !currentState;
+
+        try {
+            const response = await fetch('/api/auto-heat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ on: newState })
+            });
+
+            if (response.ok) {
+                await this.updateStatus();
+            } else {
+                alert('Failed to toggle auto heat');
+            }
+        } catch (error) {
+            console.error('Failed to toggle auto heat:', error);
+            alert('Failed to toggle auto heat');
+        }
+    }
+
+    async dispense() {
+        try {
+            const response = await fetch('/api/dispense', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message);
+            } else {
+                alert('Failed to dispense');
+            }
+        } catch (error) {
+            console.error('Failed to dispense:', error);
+            alert('Failed to dispense');
+        }
+    }
+}
+
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ClankaMateroApp();
+});

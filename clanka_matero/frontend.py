@@ -1,14 +1,14 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, render_template, abort
 )
 
 
-bp = Blueprint('frontend', __name__, url_prefix='/frontend')
+bp = Blueprint('frontend', __name__)
 
 
 @bp.route('/', methods=['GET'])
 def index():
-    return render_template('frontend/index.html')
+    return render_template('index.html')
 
