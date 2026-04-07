@@ -5,8 +5,49 @@ import time
 import threading
 import json
 import os
-import RPi.GPIO as GPIO
-from gpiozero import OutputDevice, Button, LED
+from logging import getLogger
+logger = getLogger("application")
+try:
+    import RPi.GPIO as GPIO
+    from gpiozero import OutputDevice, Button, LED
+except ImportError:
+    logger.warning("GPIO libraries not found, using mock implementations. This code will not control real hardware.")
+    # Mock GPIO and gpiozero for non-Raspberry Pi environments
+    class GPIO:
+        BCM = None
+        IN = None
+        PUD_UP = None
+
+        @staticmethod
+        def setmode(mode):
+            pass
+
+        @staticmethod
+        def setup(pin, mode, pull_up_down=None):
+            pass
+
+        @staticmethod
+        def input(pin):
+            return 1  # Always return water level OK for testing
+
+    class OutputDevice:
+        def __init__(self, pin):
+            self.pin = pin
+
+        def on(self):
+            print(f"OutputDevice on pin {self.pin} turned ON")
+
+        def off(self):
+            print(f"OutputDevice on pin {self.pin} turned OFF")
+
+    class Button:
+        def __init__(self, pin, pull_up=True, bounce_time=0.05):
+            self.pin = pin
+            self.when_pressed = None
+            self.when_released = None
+
+    class LED(OutputDevice):
+        pass
 
 class CrackaController:
     def __init__(self):
@@ -34,7 +75,12 @@ class CrackaController:
 
         # ---- Temp sensor ----
         base_dir = '/sys/bus/w1/devices/'
-        device_folder = glob.glob(base_dir + '28*')[0]
+        device_folder_glob = glob.glob(base_dir + '28*')
+        if not device_folder_glob or len(device_folder_glob) == 0:
+            logger.error("No temperature sensor found! Make sure the DS18B20 is connected properly.")
+            device_folder = ""
+        else:
+            device_folder = glob.glob(base_dir + '28*')[0]
         self.device_file = device_folder + '/w1_slave'
 
         # ---- State ----
