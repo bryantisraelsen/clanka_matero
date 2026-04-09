@@ -156,7 +156,7 @@ class ClankaMateroApp {
     }
 
     async setDispenseTime() {
-        const seconds = parseInt(this.controlElements.dispenseTimeInput.value);
+        const seconds = parseFloat(this.controlElements.dispenseTimeInput.value);
         if (isNaN(seconds) || seconds < 1 || seconds > 300) {
             alert('Please enter a valid time between 1 and 300 seconds');
             return;
