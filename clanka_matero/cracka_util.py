@@ -239,6 +239,7 @@ class CrackaController:
 
             time.sleep(1)
         self.heater.off()
+        self.heater_on = False
 
     def start_automatic_heat_control(self):
         if self.auto_running:
