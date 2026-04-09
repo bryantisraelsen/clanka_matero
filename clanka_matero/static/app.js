@@ -163,7 +163,7 @@ class ClankaMateroApp {
         }
 
         try {
-            const response = await fetch('/api/dispense-time', {
+            const response = await fetch('/api/set_dispense', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
