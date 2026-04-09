@@ -118,8 +118,8 @@ class ClankaMateroApp {
         // Update control values
         // this.controlElements.desiredTempInput.value = data.desired_temperature;
         // this.controlElements.dispenseTimeInput.value = data.dispense_time;
-        this.controlElements.toggleAutoHeatBtn.textContent = data.auto_heat_on ? 'ON' : 'OFF';
-        this.controlElements.toggleAutoHeatBtn.setAttribute('data-active', data.auto_heat_on);
+        this.controlElements.toggleAutoHeatBtn.textContent = data.auto_heat_running ? 'ON' : 'OFF';
+        this.controlElements.toggleAutoHeatBtn.setAttribute('data-active', data.auto_heat_running);
 
         this.controlElements.dispenseEnabled.textContent = data.dispense_enabled ? 'YES' : 'NO';
         this.controlElements.dispenseEnabled.setAttribute('data-status', data.dispense_enabled);
