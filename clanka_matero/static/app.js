@@ -237,9 +237,9 @@ class ClankaMateroApp {
         const newState = !currentState;
         let endpoint;
         if (newState) {
-            endpoint = '/api/enable_dispense';
+            endpoint = '/api/dispense_enable';
         } else {
-            endpoint = '/api/disable_dispense';
+            endpoint = '/api/dispense_disable';
         }
         
         try {
