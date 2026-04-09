@@ -103,12 +103,14 @@ class ClankaMateroApp {
     }
 
     updateStatusDisplay(data) {
+        console.log(data);
         this.statusElements.currentTemp.textContent = `${data.current_temp_f}°F`;
         this.statusElements.desiredTemp.textContent = `${data.target_temp_f}°F`;
         this.statusElements.dispenseTime.textContent = `${data.dispense_time_sec}s`;
 
         this.updateStatusIndicator(this.statusElements.heaterStatus, data.heating);
-        this.updateStatusIndicator(this.statusElements.waterLevelStatus, data.water_ok ? 'ok' : 'low');
+        this.statusElements.waterLevelStatus.textContent = data.water_ok ? 'ok' : 'low';
+        this.statusElements.waterLevelStatus.setAttribute('data-status', data.water_ok);
         this.updateStatusIndicator(this.statusElements.autoHeatStatus, data.auto_heat_running);
         // this.updateStatusIndicator(this.statusElements.dispenseEnabled, data.dispense_enabled);
         this.updateStatusIndicator(this.statusElements.dispensingStatus, data.dispensing);
