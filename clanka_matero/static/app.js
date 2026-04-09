@@ -20,7 +20,8 @@ class ClankaMateroApp {
             dispenseTimeInput: document.getElementById('dispense-time-input'),
             setDispenseTimeBtn: document.getElementById('set-dispense-time-btn'),
             toggleAutoHeatBtn: document.getElementById('toggle-auto-heat'),
-            dispenseBtn: document.getElementById('dispense-btn')
+            dispenseBtn: document.getElementById('dispense-btn'),
+            dispenseEnabled: document.getElementById('dispense-enabled')
         };
 
         this.themeToggle = document.getElementById('theme-toggle');
