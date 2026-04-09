@@ -235,6 +235,7 @@ class ClankaMateroApp {
     }
 
     async toggleDispense() {
+        console.log(this.statusElements.dispenseEnabled.getAttribute('data-status'));
         const currentState = this.statusElements.dispenseEnabled.getAttribute('data-status') === 'true';
         const newState = !currentState;
         let endpoint;
