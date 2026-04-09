@@ -185,7 +185,7 @@ class ClankaMateroApp {
     async toggleAutoHeat() {
         const currentState = this.controlElements.toggleAutoHeatBtn.getAttribute('data-active') === 'true';
         const newState = !currentState;
-
+        let endpoint;
         try {
             if (newState) {
                 endpoint = '/api/start_auto';
@@ -235,6 +235,7 @@ class ClankaMateroApp {
     async toggleDispense() {
         const currentState = this.statusElements.dispenseEnabled.getAttribute('data-status') === 'true';
         const newState = !currentState;
+        let endpoint;
         if (newState) {
             endpoint = '/api/enable_dispense';
         } else {
