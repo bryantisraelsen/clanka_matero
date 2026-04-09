@@ -123,6 +123,8 @@ class ClankaMateroApp {
 
         this.controlElements.dispenseEnabled.textContent = data.dispense_enabled ? 'YES' : 'NO';
         this.controlElements.dispenseEnabled.setAttribute('data-status', data.dispense_enabled);
+
+        this.updateStatusIndicator(this.statusElements.dispenseEnabled, data.dispense_enabled);
     }
 
     updateStatusIndicator(element, isActive) {
