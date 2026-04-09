@@ -104,7 +104,7 @@ class ClankaMateroApp {
 
     updateStatusDisplay(data) {
         console.log(data);
-        this.statusElements.currentTemp.textContent = `${data.current_temp_f}°F`;
+        this.statusElements.currentTemp.textContent = `${data.current_temp_f.toFixed(1)}°F`;
         this.statusElements.desiredTemp.textContent = `${data.target_temp_f}°F`;
         this.statusElements.dispenseTime.textContent = `${data.dispense_time_sec}s`;
 
