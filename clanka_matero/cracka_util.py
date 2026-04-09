@@ -8,27 +8,10 @@ import os
 from logging import getLogger
 logger = getLogger("application")
 try:
-    import RPi.GPIO as GPIO
-    from gpiozero import OutputDevice, Button, LED
+    from gpiozero import OutputDevice, Button, LED, DigitalInputDevice
 except ImportError:
     logger.warning("GPIO libraries not found, using mock implementations. This code will not control real hardware.")
     # Mock GPIO and gpiozero for non-Raspberry Pi environments
-    class GPIO:
-        BCM = None
-        IN = None
-        PUD_UP = None
-
-        @staticmethod
-        def setmode(mode):
-            pass
-
-        @staticmethod
-        def setup(pin, mode, pull_up_down=None):
-            pass
-
-        @staticmethod
-        def input(pin):
-            return 1  # Always return water level OK for testing
 
     class OutputDevice:
         def __init__(self, pin):
@@ -49,6 +32,16 @@ except ImportError:
     class LED(OutputDevice):
         pass
 
+    class DigitalInputDevice:
+        def __init__(self, pin, pull_up=True):
+            self.pin = pin
+            self.pull_up = pull_up
+
+        @property
+        def value(self):
+            return True  # Always return water level OK for testing
+
+
 class CrackaController:
     def __init__(self):
         # ---- Files ----
@@ -59,10 +52,8 @@ class CrackaController:
         os.makedirs(".status", exist_ok=True)
 
         # ---- GPIO ----
-        GPIO.setmode(GPIO.BCM)
-
         self.WATER_PIN = 5
-        GPIO.setup(self.WATER_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        self.water_sensor = DigitalInputDevice(self.WATER_PIN, pull_up=True)
 
         self.heater = OutputDevice(6)
 
@@ -140,7 +131,7 @@ class CrackaController:
     # ---------------- BASIC GETTERS ----------------
 
     def get_water_level_ok(self):
-        return GPIO.input(self.WATER_PIN) == 1
+        return self.water_sensor.value
 
     def get_curr_temperature(self):
         try:
