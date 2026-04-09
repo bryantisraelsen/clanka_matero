@@ -47,12 +47,7 @@ Clanka Matero is a Raspberry Pi-based hot water dispenser control system. It pro
    cd clanka_matero
    ```
 
-2. **Create a virtual environment**:
-   ```bash
-   python3 -m venv venv
-   ```
-
-3. **Install dependencies**:
+2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
@@ -68,12 +63,7 @@ Clanka Matero is a Raspberry Pi-based hot water dispenser control system. It pro
 
 ## Running the Server
 
-1. **Activate the virtual environment**:
-   ```bash
-   source venv/bin/activate
-   ```
-
-2. **Run the server**:
+1. **Run the server**:
    ```bash
    ./start_server.sh
    ```
