@@ -131,7 +131,7 @@ class CrackaController:
     # ---------------- BASIC GETTERS ----------------
 
     def get_water_level_ok(self):
-        print(self.water_sensor.value)
+        # print(self.water_sensor.value)
         return self.water_sensor.value == 0
 
     def get_curr_temperature(self):
