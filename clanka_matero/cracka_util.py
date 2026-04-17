@@ -154,7 +154,7 @@ class CrackaController:
     def get_water_level_ok(self):
         # print(self.water_sensor.value)
         #return self.water_sensor.value == 1
-        return self.water_sensor.value
+        return GPIO.input(self.WATER_PIN) == 1
 
     def get_curr_temperature(self):
         try:
